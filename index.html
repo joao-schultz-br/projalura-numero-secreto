@@ -1,12 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Jogo do Número Secreto</title>
 </head>
 <body>
-    
+    <main class="game-card">
+        <p class="eyebrow">JOGO DE ADIVINHAÇÃO</p>
+        <h1>Descubra o número secreto</h1>
+        <p class="description">Pensei em um número entre <strong>0 e 100</strong>. Será que você consegue descobrir?</p>
+
+        <form id="guess-form">
+            <label for="guess-input">Seu palpite</label>
+            <div class="guess-controls">
+                <input
+                    id="guess-input"
+                    name="guess"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    placeholder="Ex.: 42"
+                    required
+                    autofocus
+                >
+                <button type="submit">Chutar</button>
+            </div>
+        </form>
+
+        <p id="message" class="message" role="status" aria-live="polite">Digite um número e faça seu primeiro chute.</p>
+        <p id="attempts" class="attempts">Tentativas: 0</p>
+        <button id="restart-button" class="restart-button" type="button" hidden>Jogar novamente</button>
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>
