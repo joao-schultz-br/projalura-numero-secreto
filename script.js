@@ -9,7 +9,7 @@ let attempts;
 let gameOver;
 
 function startGame() {
-    secretNumber = Math.floor(Math.random() * 101);
+    secretNumber = Math.floor(Math.random() * 51);
     attempts = 0;
     gameOver = false;
     input.disabled = false;
@@ -27,8 +27,8 @@ form.addEventListener("submit", (event) => {
     if (gameOver) return;
 
     const guess = input.valueAsNumber;
-    if (!Number.isInteger(guess) || guess < 0 || guess > 100) {
-        message.textContent = "Digite um número inteiro entre 0 e 100.";
+    if (!Number.isInteger(guess) || guess < 0 || guess > 50) {
+        message.textContent = "Digite um número inteiro entre 0 e 50.";
         input.focus();
         return;
     }
