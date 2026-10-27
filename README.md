@@ -90,6 +90,9 @@ Antes de `git add .`, confira `git status` para não incluir arquivos que não q
 # Descartar alterações não preparadas de um arquivo
 git restore <arquivo>
 
+# Tirar um arquivo da área de preparação, mantendo as alterações no arquivo
+git reset <arquivo>
+
 # Desfazer um commit criando outro commit inverso (recomendado para commits já enviados)
 git revert <id-do-commit>
 
@@ -97,7 +100,30 @@ git revert <id-do-commit>
 git reflog
 ```
 
-`git restore <arquivo>` descarta as alterações locais desse arquivo. Use somente se tiver certeza de que não precisa delas. Evite `git reset --hard` e `git clean`: eles podem apagar trabalho local. Para corrigir um commit que ainda não foi enviado, consulte `git commit --amend`; não altere commits que outras pessoas já receberam sem combinar com elas.
+`git restore <arquivo>` descarta as alterações locais ainda não preparadas desse arquivo. Use somente se tiver certeza de que não precisa delas. Já `git reset <arquivo>` (sem indicar um commit) apenas tira o arquivo da área de preparação, mantendo o conteúdo alterado no seu computador.
+
+#### O que faz `git reset`
+
+`git reset` move a branch atual para outro commit. O efeito sobre as alterações depende da opção:
+
+```bash
+# Voltar o último commit, mantendo as alterações preparadas para um novo commit
+git reset --soft HEAD~1
+
+# Voltar o último commit e deixar as alterações no computador, mas fora da área de preparação
+git reset HEAD~1
+
+# Voltar o último commit e descartar alterações rastreadas; uso perigoso
+git reset --hard HEAD~1
+```
+
+`HEAD~1` significa “o commit anterior ao atual”. Sem `--soft` ou `--hard`, o padrão é `--mixed`: o commit é removido da ponta da branch e as alterações dele ficam nos arquivos, mas deixam de estar preparadas. `--soft` também move a branch, mas mantém as alterações preparadas. `--hard` move a branch e descarta as alterações rastreadas no diretório de trabalho e na área de preparação. **Não use `--hard` se houver trabalho que queira preservar.**
+
+Em geral, use `git revert <id-do-commit>` para desfazer um commit já enviado ao GitHub: ele cria um novo commit de reversão sem reescrever o histórico compartilhado. `git reset` é mais indicado para reorganizar commits locais que ainda não foram compartilhados. `git reflog` pode ajudar a localizar um commit após um reset, mas não é um substituto para cópias de segurança.
+
+Para corrigir a mensagem ou incluir alterações em um commit local recente, `git commit --amend` substitui o commit atual por outro. Evite usar essa opção em commits que outras pessoas já receberam sem combinar com elas.
+
+`git clean` remove arquivos não rastreados pelo Git. Ele não é necessário no fluxo normal deste projeto e pode apagar arquivos locais; não o execute sem entender exatamente o que será removido.
 
 ### Trabalhar com branches
 
@@ -228,3 +254,24 @@ git remote set-url origin git@github.com:joao-schultz-br/projalura-numero-secret
 ```
 
 Com HTTPS, autentique-se pelo navegador ou pelo gerenciador de credenciais do Git; o GitHub não aceita a senha normal da conta como senha para operações Git.
+
+### Entender os nomes e opções usados
+
+- **Repositório**: a pasta do projeto acompanhada pelo Git.
+- **Commit**: um registro de alterações. `-m "mensagem"` informa a descrição do commit.
+- **Branch**: uma linha de trabalho. `main` é o nome da branch principal deste projeto.
+- **`HEAD`**: indica o commit atual. `HEAD~1` indica seu primeiro antecessor.
+- **Área de preparação (staging)**: alterações selecionadas com `git add` para entrar no próximo commit.
+- **`origin`**: nome padrão dado ao repositório remoto, normalmente o endereço no GitHub.
+- **`<arquivo>`, `<id-do-commit>` e `<nome-da-branch>`**: espaços reservados; substitua-os pelo valor real e não digite os sinais `<` e `>`.
+- **Opções com hífen**: `--all` inclui todas as branches; `--oneline` resume cada commit em uma linha; `--graph` desenha as linhas do histórico; `--decorate` mostra nomes de branches e tags; `--staged` limita a comparação ao que está preparado; `--stat` mostra um resumo de arquivos alterados; `--short` encurta o status; `--branch` inclui a branch no status.
+- **`-u` em `git push -u`**: configura a branch remota como padrão para próximos `git push` e `git pull`.
+- **`--ff-only` em `git pull`**: só atualiza a branch quando o avanço pode ser feito sem criar um commit de merge; se houver divergência, o comando para em vez de escolher uma integração automaticamente.
+- **`-a` e `-m` em `git tag -a ... -m ...`**: criam uma tag anotada e definem sua mensagem.
+- **`--global` em `git config`**: salva a configuração para todos os repositórios do usuário neste computador.
+- **`ssh-add -l`**: lista identidades carregadas no agente SSH. **`ls -al ~/.ssh`** é um comando do Terminal que lista também arquivos ocultos na pasta SSH.
+- **`ssh-keygen -t ed25519 -C "seu-email"`**: cria uma chave SSH Ed25519; `-C` adiciona um comentário para identificar a chave.
+- **`ssh-add --apple-use-keychain`**: carrega a chave SSH no agente do macOS e permite integrá-la ao Chaves do macOS.
+- **`pbcopy < ~/.ssh/id_ed25519.pub`**: copia o conteúdo da chave pública para a área de transferência do macOS. O arquivo sem `.pub` é a chave privada e não deve ser compartilhado.
+- **`ssh -T git@github.com`**: testa a autenticação SSH com o GitHub; não abre um terminal remoto e não envia arquivos.
+- **`git remote set-url`**: altera o endereço associado ao remoto `origin`; não muda os arquivos do projeto nem envia alterações.
